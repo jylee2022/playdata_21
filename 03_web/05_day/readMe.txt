@@ -88,3 +88,62 @@
 		return pageDTO;
 		
 	}//end list
+
+#################################
+PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			String sql="select num, title, author, content, to_char(writeday, 'YYYY/MM/dd') as writeday, "
+					+ " readcnt from board ";
+			
+			if("title".equals(searchName) && searchValue != null) {
+				sql += " where title LIKE ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, "%"+searchValue+"%");
+
+			}else if("author".equals(searchName) && searchValue != null){
+				sql += " where author LIKE ?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, "%"+searchValue+"%");
+
+			}else {
+				pstmt = con.prepareStatement(sql);
+			}
+			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				int num = rs.getInt("num");
+			    String title = rs.getString("title");
+				String author = rs.getString("author");
+				String writeday = rs.getString("writeday");
+				int readcnt = rs.getInt("readcnt");
+				// 나중에 Builder 패턴
+				BoardDTO dto = new BoardDTO();
+				dto.setNum(num);
+				dto.setTitle(title);
+				dto.setAuthor(author);
+				dto.setWriteday(writeday);
+				dto.setReadcnt(readcnt);
+				list.add(dto);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(rs!=null)rs.close();
+				if(pstmt!=null)pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
+		}
+
+
+
+
+
+
+
+
+
+
+
